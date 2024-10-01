@@ -17,6 +17,9 @@ const blogSchema = new Schema({
         type: String,
         required: true,
     },
+    category: {
+        type: String,
+    },
     comments: [
         {
             type: Schema.Types.ObjectId,
