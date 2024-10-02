@@ -58,7 +58,30 @@ const deleteBlog = async (req, res) => {
     return res.status(200).json({message: 'successfully deleted blog', req_user});
 }
 
+const updateBlog = async (req, res) => {
+    const{blog_id, title, blog_content, category} = req.body;
+    
+    if(!blog_id){
+        return res.status(400).json({message: 'blog_id is required'});
+    }
+    if(!req.user){
+        return res.status(400).json({message: 'login is required'});
+    }
+    const blog = await Blog.findById(blog_id);
+    if(!blog){
+        return res.status(400).json({message: 'Blog not found'});
+    }
+    console.log(blog.created_by,"----", req.user._id);
+    if(blog.created_by.toString() != req.user._id.toString()){
+        return res.status(400).json({message: 'You are not authorized to update this blog'});
+    }
+    
 
+    await Blog.findByIdAndUpdate(blog_id, {title, blog_content, category});
+    
+    const req_user = await User.findById(req.user._id).populate('blogs');
+    return res.status(200).json({message: 'successfully updated blog', req_user});
+}
 
 const star_blog = async (req, res) => {
     const {blog_id} = req.body;
@@ -121,7 +144,9 @@ const user_blogs = async (req, res) => {
 
 export { createBlog,
         deleteBlog,
-     star_blog, unstar_blog,
+        updateBlog,
+     star_blog,
+      unstar_blog,
      user_blogs,
      get_star_blogs,
     };

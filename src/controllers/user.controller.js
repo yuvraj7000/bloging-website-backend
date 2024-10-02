@@ -120,8 +120,25 @@ const logoutUser = async(req,res)=> {
       
      
 }
-    
 
 
+const myProfile = async(req, res) => {
+    if(!req.user){
+        return res.status(400).json({message: 'login is required'});
+    }
+    const user = await User.findById(req.user._id).select('-password -refreshToken').populate('blogs');
+    return res.status(200).json({message: 'getting user successful', user});
+}
 
-export { registerUser, loginUser, logoutUser }
+
+const userProfile = async(req, res) => {
+    const {username} = req.body;
+    const user = await User.findOne({username}).select('-password -refreshToken -stars').populate('blogs');
+    if(!user){
+        return res.status(400).json({message: 'User not found'});
+    }
+    return res.status(200).json({message: 'getting user successful', user});
+}
+
+
+export { registerUser, loginUser, logoutUser, myProfile, userProfile }
