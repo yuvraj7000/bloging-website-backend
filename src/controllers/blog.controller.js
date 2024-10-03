@@ -140,7 +140,34 @@ const user_blogs = async (req, res) => {
     res.status(200).json({message:"getting blogs successful", blogs});
 }
 
+const latest_blogs = async (req, res) => {
+    const blogs = await Blog.find().sort({createdAt: -1}).limit(10).populate({
+        path: 'created_by',
+        select: 'username user_img'
+    });
+    res.status(200).json({message:"getting latest blogs successful", blogs});
+}
 
+const category_blogs = async (req, res) => {
+    const {category} = req.body;
+
+   
+    const blogs = await Blog.find({category}).populate({path : 'created_by', select : 'username user_img'}).sort({createdAt: -1}).limit(10);
+    if(!blogs){
+        return res.status(400).json({message: 'No blogs found'});
+    }
+    res.status(200).json({message:"getting latest category blogs successful", blogs});
+}
+
+const search_blogs_or_users = async (req, res) => {
+    const {search} = req.body;
+    const blogs = await Blog.find({title: {$regex: search, $options: 'i'}}).populate({path : 'created_by', select : 'username user_img'}).sort({createdAt: -1}).limit(10);
+    const users = await User.find({username: {$regex: search, $options: 'i'}}).select('username user_img');
+    if(!blogs && !users){
+        return res.status(400).json({message: 'No blogs or users found'});
+    }
+    res.status(200).json({message:"getting search results successful", blogs, users});
+}
 
 export { createBlog,
         deleteBlog,
@@ -149,4 +176,7 @@ export { createBlog,
       unstar_blog,
      user_blogs,
      get_star_blogs,
+        latest_blogs,
+        category_blogs,
+        search_blogs_or_users,
     };

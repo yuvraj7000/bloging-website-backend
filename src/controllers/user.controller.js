@@ -141,4 +141,26 @@ const userProfile = async(req, res) => {
 }
 
 
-export { registerUser, loginUser, logoutUser, myProfile, userProfile }
+const editProfile = async(req, res) => {
+    const {fullname, email, description } = req.body;
+    if(!req.user){
+        return res.status(400).json({message: 'login is required'});
+    }
+    const user = await User.findById(req.user._id);
+    if(!user){
+        return res.status(400).json({message: 'User not found'});
+    }
+    if(fullname){
+        user.fullname = fullname;
+    }
+    if(email){
+        user.email = email;
+    }
+    if(description){
+        user.description = description;
+    }
+    await user.save();
+    return res.status(200).json({message: 'User updated successfully', user});
+}
+
+export { registerUser, loginUser, logoutUser, myProfile, userProfile, editProfile }
