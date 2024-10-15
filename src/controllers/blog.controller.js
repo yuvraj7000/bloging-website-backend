@@ -4,6 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createBlog = async (req, res) => {
     const { title, blog_content, category} = req.body;
+    console.log(req.body);
     if(!title || !blog_content){
         return res.status(400).json({message: 'title and content are required'});
     }
@@ -15,10 +16,10 @@ const createBlog = async (req, res) => {
 
     const imageLocalPath = req.file?.path || "";
     const blog_img = imageLocalPath ? await uploadOnCloudinary(imageLocalPath) : "";
-    
+    console.log(blog_img);
     const blog = new Blog({
         title,
-        blog_content,
+        "blog_content" : blog_content || "",
         category: category || "",
         created_by: user._id,
         blog_img: blog_img?.url || "",
@@ -169,6 +170,42 @@ const search_blogs_or_users = async (req, res) => {
     res.status(200).json({message:"getting search results successful", blogs, users});
 }
 
+const getBlog = async (req, res) => {
+    const { blogId } = req.body;
+    console.log(blogId);
+    try {
+        const blog = await Blog.findById(blogId)
+            .populate({
+                path: 'created_by',
+                select: 'username user_img'
+            })
+            .populate({
+                path: 'comments',
+                populate: [
+                    {
+                        path: 'comment_by',
+                        select: 'username user_img'
+                    },
+                    {
+                        path: 'reply',
+                        populate: {
+                            path: 'comment_by',
+                            select: 'username user_img'
+                        }
+                    }
+                ]
+            });
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog not found' });
+        }
+        return res.status(200).json({ message: 'Blog fetched successfully', blog });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
 export { createBlog,
         deleteBlog,
         updateBlog,
@@ -179,4 +216,5 @@ export { createBlog,
         latest_blogs,
         category_blogs,
         search_blogs_or_users,
+        getBlog,
     };

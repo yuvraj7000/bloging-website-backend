@@ -8,8 +8,12 @@ import comment_router from './routers/comment.router.js';
 import like_router from './routers/like.router.js';
 
 const app = express();
-
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  };
+  
+  app.use(cors(corsOptions));
 app.use(express.json({limit: '16kb'}));
 app.use(express.urlencoded({extended: true, limit: '16kb'}));
 app.use(express.static('public'));
