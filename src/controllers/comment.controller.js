@@ -34,6 +34,9 @@ const add_reply = async (req, res) => {
     });
     await comment.save();
     const parent_comment = await Comment.findById(comment_id);
+    if(!parent_comment){
+        return res.status(400).json({ message: 'Parent comment not found' });
+    }
     parent_comment.reply.push(comment._id);
     await parent_comment.save();
     return res.status(200).json({ message: 'Reply added successfully', comment, parent_comment });

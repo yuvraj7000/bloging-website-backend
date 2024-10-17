@@ -1,6 +1,6 @@
 import { User } from "../models/user.model.js";
 import { Blog } from "../models/blog.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 const createBlog = async (req, res) => {
     const { title, blog_content, category} = req.body;
@@ -53,6 +53,23 @@ const deleteBlog = async (req, res) => {
     if(blog.created_by.toString() != req.user._id.toString()){
         return res.status(400).json({message: 'You are not authorized to delete this blog'});
     }
+
+    if (blog.blog_img) {
+        console.log(blog.blog_img);
+    
+        // Extract the publicId from the URL
+        const publicId = blog.blog_img.split('/').slice(-1)[0].split('.')[0];
+        // const getPublicId = (imageURL) => imageURL.split("/").pop().split(".")[0];
+        console.log(publicId);
+        try {
+            const img = await deleteFromCloudinary(publicId);
+            console.log(img);
+        } catch (error) {
+            console.error('Error deleting file from Cloudinary:', error);
+        }
+    }
+
+
     await Blog.findByIdAndDelete(blog_id);
     
     const req_user = await User.findById(req.user._id).populate('blogs');
@@ -97,6 +114,9 @@ const star_blog = async (req, res) => {
     const blog = await Blog.findById(blog_id);
     if(!blog){
         return res.status(400).json({message: 'Blog not found'});
+    }
+    if(user.stars.includes(blog_id)){
+        return res.status(200).json({message: 'Blog already saved'});
     }
     user.stars.push(blog_id);
     await user.save();
@@ -151,7 +171,7 @@ const latest_blogs = async (req, res) => {
 
 const category_blogs = async (req, res) => {
     const {category} = req.body;
-
+    console.log("category -> ", category);
    
     const blogs = await Blog.find({category}).populate({path : 'created_by', select : 'username user_img'}).sort({createdAt: -1}).limit(10);
     if(!blogs){
