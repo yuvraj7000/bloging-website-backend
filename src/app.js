@@ -9,7 +9,7 @@ import like_router from './routers/like.router.js';
 
 const app = express();
 const corsOptions = {
-    origin: 'http://localhost:5173', // Allow requests from this origin
+    origin: 'https://bloging-frontend-ochre.vercel.app', // Allow requests from this origin
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   };
   
