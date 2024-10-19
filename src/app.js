@@ -11,6 +11,7 @@ const app = express();
 const corsOptions = {
     origin: 'https://blogwaveapp.vercel.app', // Allow requests from this origin
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    methods: 'GET, POST, PUT, DELETE, OPTIONS', // Allow only these methods
   };
   
   app.use(cors(corsOptions));
