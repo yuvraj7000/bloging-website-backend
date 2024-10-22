@@ -3,39 +3,44 @@ import { Blog } from "../models/blog.model.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 const createBlog = async (req, res) => {
-    const { title, blog_content, category} = req.body;
-    console.log(req.body);
-    if(!title || !blog_content){
-        return res.status(400).json({message: 'title and content are required'});
+    try {
+        const { title, blog_content, blog_img, category } = req.body;
+        console.log(blog_img);
+        
+        if (!title || !blog_content) {
+            return res.status(400).json({ message: 'Title and content are required' });
+        }
+
+        const user = await User.findById(req.user._id);
+        console.log(req.user._id);
+
+        if (!user) {
+            return res.status(400).json({ message: 'User not found. || Login is required' });
+        }
+
+        // const imageLocalPath = req.file?.path || "";
+        // const blog_img = imageLocalPath ? await uploadOnCloudinary(imageLocalPath) : "";
+        // console.log(blog_img);
+
+        const blog = new Blog({
+            title,
+            blog_content: blog_content || "",
+            category: category || "",
+            created_by: user._id,
+            blog_img: blog_img,
+        });
+
+        await blog.save();
+
+        user.blogs.push(blog._id);
+        await user.save();
+
+        res.status(200).json({ message: 'Blog created successfully', blog, user });
+    } catch (error) {
+        console.error('Error creating blog:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-    const user = await User.findById(req.user._id);
-    console.log(req.user._id);
-    if(!user){
-        return res.status(400).json({message: 'User not found. || login is required'});
-    }
-
-    const imageLocalPath = req.file?.path || "";
-    const blog_img = imageLocalPath ? await uploadOnCloudinary(imageLocalPath) : "";
-    console.log(blog_img);
-    const blog = new Blog({
-        title,
-        "blog_content" : blog_content || "",
-        category: category || "",
-        created_by: user._id,
-        blog_img: blog_img?.url || "",
-
-    })
-
-    await blog.save();
-
-    user.blogs.push(blog._id);
-
-    await user.save();
-
-    res.status(200).json({message: 'Blog created successfully', blog, user});
-
-
-} 
+};
 
 const deleteBlog = async (req, res) => {
     const{blog_id} = req.body;

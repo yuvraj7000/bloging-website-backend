@@ -4,7 +4,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const blog_router = Router();
 
-blog_router.route("/create_blog").post(verifyJWT,upload.single('blog_img'),createBlog);
+blog_router.route("/create_blog").post(verifyJWT,createBlog);
 blog_router.route("/delete_blog").post(verifyJWT,deleteBlog);
 blog_router.route("/update_blog").post(verifyJWT,updateBlog);
 blog_router.route("/star_blog").post(verifyJWT, star_blog);

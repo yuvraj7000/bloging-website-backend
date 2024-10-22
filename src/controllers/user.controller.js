@@ -21,7 +21,7 @@ const generateTokens = async(user_id) => {
 
 
 const registerUser = async(req, res) => {
-    const {fullname, email, username, password, description } = req.body;
+    const {fullname, email, username,user_img, password, description } = req.body;
 
     if(!fullname || !email || !username || !password){
         return res.status(400).json({message: 'All fields are required'});
@@ -33,17 +33,13 @@ const registerUser = async(req, res) => {
     if(is_user_exist){
         return res.status(400).json({message: 'Username or email already exist'});
     }
-
-    const imageLocalPath = req.file?.path || "";
-    
-    const image = imageLocalPath ? await uploadOnCloudinary(imageLocalPath) : "";
     const user = new User({
         fullname,
         email,
         username : username.toLowerCase(),
         password,
         description: description || "",
-        user_img: image?.url || "",
+        user_img,
     });
     console.log(user)
     await user.save();
