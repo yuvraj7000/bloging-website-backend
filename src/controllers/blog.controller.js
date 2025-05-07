@@ -167,7 +167,7 @@ const user_blogs = async (req, res) => {
 }
 
 const latest_blogs = async (req, res) => {
-    const blogs = await Blog.find().sort({createdAt: -1}).limit(10).populate({
+    const blogs = await Blog.find().sort({createdAt: -1}).limit(12).populate({
         path: 'created_by',
         select: 'username user_img'
     });
