@@ -8,11 +8,15 @@ import comment_router from './routers/comment.router.js';
 import like_router from './routers/like.router.js';
 
 const app = express();
+const allowedOrigins = [
+    'https://blogwave.yuvrajyadav.tech',
+    'https://blogwaveapp.vercel.app'
+];
 const corsOptions = {
-    origin: '*', // Allow requests from any origin
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-    methods: 'GET, POST, PUT, DELETE, OPTIONS', // Allow only these methods
-  };
+    origin: allowedOrigins,
+    credentials: true,
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
+};
   
   app.use(cors(corsOptions));
 
