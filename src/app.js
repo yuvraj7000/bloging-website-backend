@@ -9,12 +9,13 @@ import like_router from './routers/like.router.js';
 
 const app = express();
 const corsOptions = {
-    origin: 'https://blogwaveapp.vercel.app', // Allow requests from this origin
+    origin: '*', // Allow requests from any origin
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     methods: 'GET, POST, PUT, DELETE, OPTIONS', // Allow only these methods
   };
   
   app.use(cors(corsOptions));
+
 app.use(express.json({limit: '16kb'}));
 app.use(express.urlencoded({extended: true, limit: '16kb'}));
 app.use(express.static('public'));
